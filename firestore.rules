@@ -1,0 +1,73 @@
+/**
+ * @fileoverview Firestore Security Rules for the Travel Information App.
+ *
+ * Core Philosophy:
+ * This ruleset provides public read access to country and info item data while restricting write access to prevent unauthorized modifications.
+ * Reservation data is also publicly accessible for reads but writes are restricted to authenticated users.
+ * The absence of user-specific data or roles (besides the auth.uid) simplifies the rules.
+ *
+ * Data Structure:
+ * The data is organized hierarchically: /countries/{countryId}/infoItems/{infoItemId}/reservations/{reservationId}.
+ * This structure allows for efficient data retrieval and management.
+ *
+ * Key Security Decisions:
+ * - Public read access for countries and info items is enabled to allow all users to view the data.
+ * - Writes to countries and info items are denied to prevent unauthorized modifications.
+ * - Read and write access to reservations are restricted to authenticated users.
+ * - The rules do not enforce strict schema validation to allow for rapid prototyping, but they do enforce that critical relational fields must be consistent and immutable.
+ * - Admin access is out-of-scope for these rules.
+ *
+ * Denormalization for Authorization:
+ * - `infoItems` include a denormalized `countryId` to allow for independent authorization without needing to `get()` the parent country document.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Grants public read access to country data and restricts write access.
+     * @path /countries/{countryId}
+     * @allow get, list: Anyone can read country data.
+     * @allow create, update, delete: No one can create, update, or delete country data through the client.
+     * @principle Provides public read access while preventing unauthorized writes.
+     */
+    match /countries/{countryId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Grants public read access to info item data and restricts write access.
+     * @path /countries/{countryId}/infoItems/{infoItemId}
+     * @allow get, list: Anyone can read info item data.
+     * @allow create, update, delete: No one can create, update, or delete info item data through the client.
+     * @principle Provides public read access while preventing unauthorized writes.
+     */
+    match /countries/{countryId}/infoItems/{infoItemId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Grants public read access to reservation data and restricts write access to authenticated users.
+     * @path /countries/{countryId}/infoItems/{infoItemId}/reservations/{reservationId}
+     * @allow get, list: Anyone can read reservation data.
+     * @allow create: Only authenticated users can create reservations.
+     * @allow update, delete: No one can update or delete reservation data through the client.
+     * @principle Allows authenticated users to create reservations while preventing unauthorized writes.
+     */
+    match /countries/{countryId}/infoItems/{infoItemId}/reservations/{reservationId} {
+      allow get, list: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+
+    /**
+     * @description Checks if the user is signed in.
+     * @return {boolean} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+  }
+}

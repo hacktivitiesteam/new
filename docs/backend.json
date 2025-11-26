@@ -1,0 +1,218 @@
+{
+  "entities": {
+    "Country": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Country",
+      "type": "object",
+      "description": "Represents a country with its associated information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the country."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the country."
+        },
+        "slug": {
+          "type": "string",
+          "description": "A unique URL-friendly string representing the country's name."
+        },
+        "generalInformation": {
+          "type": "string",
+          "description": "General information about the country."
+        },
+        "attractions": {
+          "type": "string",
+          "description": "Main attractions of the country."
+        },
+        "cuisine": {
+          "type": "string",
+          "description": "Information about the country's cuisine."
+        },
+        "hotels": {
+          "type": "string",
+          "description": "Information about hotels in the country."
+        },
+        "visaRequirements": {
+          "type": "string",
+          "description": "Visa requirements for the country."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the country."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "InfoItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "InfoItem",
+      "type": "object",
+      "description": "Represents a specific piece of information related to a country, such as a restaurant or a useful phrase.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the information item."
+        },
+        "countryId": {
+          "type": "string",
+          "description": "Reference to Country. (Relationship: Country 1:N InfoItem)"
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the information item (e.g., restaurant, hotel, useful phrase)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the information item."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the information item."
+        },
+        "address": {
+          "type": "string",
+          "description": "Address of the place, if applicable."
+        },
+        "contact": {
+          "type": "string",
+          "description": "Contact information (phone number, email, website), if applicable."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of an image associated with the information item.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "countryId",
+        "category",
+        "title",
+        "description"
+      ]
+    },
+    "Reservation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Reservation",
+      "type": "object",
+      "description": "Represents a reservation made for a specific info item.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the reservation."
+        },
+        "infoItemId": {
+          "type": "string",
+          "description": "Reference to InfoItem. (Relationship: InfoItem 1:N Reservation)"
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Name of the customer making the reservation."
+        },
+        "customerEmail": {
+          "type": "string",
+          "description": "Email address of the customer making the reservation.",
+          "format": "email"
+        },
+        "reservationDate": {
+          "type": "string",
+          "description": "The date and time for the reservation.",
+          "format": "date-time"
+        },
+        "numberOfPeople": {
+          "type": "number",
+          "description": "The number of people in the reservation."
+        },
+        "specialRequests": {
+          "type": "string",
+          "description": "Any special requests made by the customer."
+        }
+      },
+      "required": [
+        "id",
+        "infoItemId",
+        "customerName",
+        "customerEmail",
+        "reservationDate",
+        "numberOfPeople"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/countries/{countryId}",
+        "definition": {
+          "entityName": "Country",
+          "schema": {
+            "$ref": "#/backend/entities/Country"
+          },
+          "description": "Stores information about countries.",
+          "params": [
+            {
+              "name": "countryId",
+              "description": "The unique ID of the country."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/countries/{countryId}/infoItems/{infoItemId}",
+        "definition": {
+          "entityName": "InfoItem",
+          "schema": {
+            "$ref": "#/backend/entities/InfoItem"
+          },
+          "description": "Stores information items related to a country. Includes denormalized 'countryId' for authorization independence.",
+          "params": [
+            {
+              "name": "countryId",
+              "description": "The unique ID of the country."
+            },
+            {
+              "name": "infoItemId",
+              "description": "The unique ID of the information item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/countries/{countryId}/infoItems/{infoItemId}/reservations/{reservationId}",
+        "definition": {
+          "entityName": "Reservation",
+          "schema": {
+            "$ref": "#/backend/entities/Reservation"
+          },
+          "description": "Stores reservation data related to a specific info item.",
+          "params": [
+            {
+              "name": "countryId",
+              "description": "The unique ID of the country."
+            },
+            {
+              "name": "infoItemId",
+              "description": "The unique ID of the information item."
+            },
+            {
+              "name": "reservationId",
+              "description": "The unique ID of the reservation."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to store country information, related info items, and reservations. It prioritizes authorization independence by not requiring `get()` calls in security rules. Since there are no explicit roles or user-specific data besides reservations, the structure focuses on organizing the data in a way that's easily queryable and maintainable, with a clear separation of concerns.\n\n1.  Countries: Stores basic information about countries.\n2.  InfoItems: Stores information about specific places or items within a country. Country ID is denormalized to each InfoItem to allow for easy querying of all InfoItems for a specific country.\n3.  Reservations: Stores reservation data related to each info item.\n\nThis structure enables secure `list` operations because the security rules can be applied at the collection level without needing to check parent documents. Since there are no user-based roles or access control requirements described in the document, the security rules will focus on data validation and preventing unauthorized modifications.\n\nAdmin access is managed via cookies and Next.js server actions so it won't be a part of the firestore rules."
+  }
+}
