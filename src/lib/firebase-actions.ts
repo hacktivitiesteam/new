@@ -156,14 +156,13 @@ export async function getInfoItemById(db: Firestore, itemId: string): Promise<In
   return null;
 }
 
-export async function getInfoItemByName(db: Firestore, name: string): Promise<InfoItem | null> {
+export async function getInfoItemsByName(db: Firestore, name: string): Promise<InfoItem[]> {
     const q = query(collection(db, "infoItems"), where("name", "==", name));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
-        return null;
+        return [];
     }
-    const doc = querySnapshot.docs[0];
-    return { id: doc.id, ...doc.data() } as InfoItem;
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InfoItem));
 }
 
 export async function createOrUpdateInfoItem(db: Firestore, item: Partial<InfoItem>, id?: string): Promise<string> {
