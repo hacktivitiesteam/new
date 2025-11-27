@@ -1,3 +1,6 @@
+
+'use client';
+
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { Globe, Languages, Check, ChevronDown, Headset, Ear, PenSquare, Wand2, Menu, Sun, Moon, Laptop, CircleDollarSign } from 'lucide-react';
@@ -21,6 +24,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import Image from 'next/image';
 import AiRecommender from './ai-recommender';
 import { useTheme } from 'next-themes';
+import { ThemeToggle } from './theme-toggle';
 
 interface AppHeaderProps {
     isAdmin?: boolean;
@@ -247,5 +251,3 @@ const AppHeader = ({ isAdmin = false, lang = 'az', setLang }: AppHeaderProps) =>
 };
 
 export default AppHeader;
-
-    
