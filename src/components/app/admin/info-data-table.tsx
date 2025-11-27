@@ -105,6 +105,10 @@ export default function InfoDataTable() {
     {
       accessorKey: 'name',
       header: 'Başlıq',
+      // The accessorFn tells the table how to get the value for this column.
+      // It will check for `name`, and if it's not there, it will use `phrase`.
+      // This value is then used for sorting, filtering, and displaying.
+      accessorFn: (row) => row.name || row.phrase,
       cell: ({ row }) => <div className="font-medium">{row.original.name || row.original.phrase}</div>,
     },
     {
