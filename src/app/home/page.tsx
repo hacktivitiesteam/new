@@ -22,61 +22,12 @@ import { useReadingMode } from '@/components/app/reading-mode-provider';
 import { cn } from '@/lib/utils';
 import { useAnimation } from '@/components/app/animation-provider';
 
-function Stats({ lang }: { lang: 'az' | 'en' | 'ru' }) {
-    const { isReadingMode, speakText } = useReadingMode();
-    const content = {
-        az: {
-            section_title: 'Turistlərin Üzləşdiyi Əsas Problemlər',
-            route: 'Səyahət rotası',
-            route_desc: 'Turistlərin əksəriyyəti gedəcəyi ölkə haqqında yetərli məlumata sahib deyil.',
-            language: 'Dil',
-            language_desc: 'Səyahətçilər ünsiyyət qurmaqda çətinlik çəkir, əsas yerli ifadələr təcrübəni yaxşılaşdırır.',
-            culture: 'Mədəniyyət',
-            culture_desc: 'Turistlər ölkənin mədəniyyəti haqqında məlumatı olmur.',
-            attractions: 'Görməli yerlər',
-            attractions_desc: 'Gəzməli yerlər və onlara yaxın olan digər maraqlı nöqtələr haqqında məlumatları yoxdur.',
-            cuisine: 'Milli Mətbəx',
-            cuisine_desc: 'Turistlər ölkənin milli mətbəxini və yaxşı restoranlarını tanımır.',
-        },
-        en: {
-            section_title: 'Problems Faced by Travelers',
-            route: 'Travel Route',
-            route_desc: 'Most tourists do not have enough information about the country they are visiting.',
-            language: 'Language',
-            language_desc: 'Travelers have difficulty communicating; basic local phrases improve the experience.',
-            culture: 'Culture',
-            culture_desc: 'Tourists do not have information about the country\'s culture.',
-            attractions: 'Attractions',
-            attractions_desc: 'They lack information about places to visit and other interesting points nearby.',
-            cuisine: 'National Cuisine',
-            cuisine_desc: 'Tourists are unfamiliar with the national cuisine and good restaurants of the country.',
-        },
-        ru: {
-            section_title: 'Проблемы, с которыми сталкиваются путешественники',
-            route: 'Маршрут путешествия',
-            route_desc: 'Большинство туристов не имеют достаточной информации о стране, которую собираются посетить.',
-            language: 'Язык',
-            language_desc: 'Путешественники испытывают трудности в общении; знание основных местных фраз улучшает опыт.',
-            culture: 'Культура',
-            culture_desc: 'У туристов нет информации о культуре страны.',
-            attractions: 'Достопримечательности',
-            attractions_desc: 'У них нет информации о местах для посещения и других интересных точках поблизости.',
-            cuisine: 'Национальная кухня',
-            cuisine_desc: 'Туристы не знакомы с национальной кухней и хорошими ресторанами страны.',
-        }
-    };
+
 
     const handleSpeak = (text: string) => {
         speakText(text, lang === 'az' ? 'tr-TR' : `${lang}-${lang.toUpperCase()}`);
     }
-    
-  const stats = [
-    { icon: Route, percentage: '33.29%', title: content[lang].route, description: content[lang].route_desc },
-    { icon: Languages, percentage: '31.25%', title: content[lang].language, description: content[lang].language_desc },
-    { icon: BookOpen, percentage: '28.67%', title: content[lang].culture, description: content[lang].culture_desc },
-    { icon: MapPinned, percentage: '19.89%', title: content[lang].attractions, description: content[lang].attractions_desc },
-    { icon: UtensilsCrossed, percentage: '14.81%', title: content[lang].cuisine, description: content[lang].cuisine_desc },
-  ];
+  
 
   return (
     <div>
